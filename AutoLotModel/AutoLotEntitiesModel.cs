@@ -15,6 +15,7 @@ namespace AutoLotModel
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<Inventory> Inventories { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
+        public object Inventory { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
