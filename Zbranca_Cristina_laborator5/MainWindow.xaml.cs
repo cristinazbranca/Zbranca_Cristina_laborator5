@@ -47,13 +47,10 @@ namespace Zbranca_Cristina_laborator5
             inventoryVSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("inventoryViewSource")));
             inventoryVSource.Source = ctx.Inventories.Local;
 
-
-
             customerVSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("customerViewSource")));
             customerVSource.Source = ctx.Customers.Local;
 
-            customerOrdersVSource =
-            ((System.Windows.Data.CollectionViewSource)(this.FindResource("customerOrdersViewSource")));
+            customerOrdersVSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("customerOrdersViewSource")));
 
             //customerOrdersVSource.Source = ctx.Orders.Local;
             ctx.Customers.Load();
@@ -72,11 +69,20 @@ namespace Zbranca_Cristina_laborator5
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
             action = ActionState.New;
+            BindingOperations.ClearBinding(firstNameTextBox, TextBox.TextProperty);
+            BindingOperations.ClearBinding(lastNameTextBox, TextBox.TextProperty);
+            SetValidationBinding();
+
         }
+
         private void btnEdit_Click(object sender, RoutedEventArgs e)
         {
+            BindingOperations.ClearBinding(firstNameTextBox, TextBox.TextProperty);
+            BindingOperations.ClearBinding(lastNameTextBox, TextBox.TextProperty);
+            SetValidationBinding();
             action = ActionState.Edit;
         }
+
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
             action = ActionState.Delete;
@@ -114,8 +120,7 @@ namespace Zbranca_Cristina_laborator5
                     MessageBox.Show(ex.Message);
                 }
             }
-            else
-           if (action == ActionState.Edit)
+            else if (action == ActionState.Edit)
             {
                 try
                 {
@@ -148,11 +153,11 @@ namespace Zbranca_Cristina_laborator5
         }
         private void btnNext1_Click(object sender, RoutedEventArgs e)
         {
-            customerVSource.View.MoveCurrentToNext();
+            inventoryVSource.View.MoveCurrentToNext();
         }
         private void btnPrev1_Click(object sender, RoutedEventArgs e)
         {
-            customerVSource.View.MoveCurrentToPrevious();
+            inventoryVSource.View.MoveCurrentToPrevious();
         }
         private void SaveInventory()
         {
@@ -179,12 +184,11 @@ namespace Zbranca_Cristina_laborator5
                     MessageBox.Show(ex.Message);
                 }
             }
-            else
-           if (action == ActionState.Edit)
+            else if (action == ActionState.Edit)
             {
                 try
                 {
-                    inventory = (Inventory)customerDataGrid.SelectedItem;
+                    inventory = (Inventory)inventoryDataGrid.SelectedItem;
                     inventory.Color = colorTextBox.Text.Trim();
                     inventory.Make = makeTextBox.Text.Trim();
                     //salvam modificarile
@@ -222,6 +226,7 @@ namespace Zbranca_Cristina_laborator5
                     B.IsEnabled = false;
             }
             gbActions.IsEnabled = true;
+
         }
         private void ReInitialize()
         {
@@ -254,6 +259,7 @@ namespace Zbranca_Cristina_laborator5
                     break;
             }
             ReInitialize();
+
         }
         private void SaveOrders()
         {
@@ -282,8 +288,7 @@ namespace Zbranca_Cristina_laborator5
                     MessageBox.Show(ex.Message);
                 }
             }
-            else
-if (action == ActionState.Edit)
+            else if (action == ActionState.Edit)
             {
                 dynamic selectedOrder = ordersDataGrid.SelectedItem;
                 try
@@ -346,8 +351,31 @@ if (action == ActionState.Edit)
                              };
             customerOrdersVSource.Source = queryOrder.ToList();
         }
+        private void SetValidationBinding()
+        {
+            Binding firstNameValidationBinding = new Binding();
+            firstNameValidationBinding.Source = customerVSource;
+            firstNameValidationBinding.Path = new PropertyPath("FirstName");
+            firstNameValidationBinding.NotifyOnValidationError = true;
+            firstNameValidationBinding.Mode = BindingMode.TwoWay;
+            firstNameValidationBinding.UpdateSourceTrigger =
+           UpdateSourceTrigger.PropertyChanged;
+            //string required
+            firstNameValidationBinding.ValidationRules.Add(new StringNotEmpty());
+            firstNameTextBox.SetBinding(TextBox.TextProperty, firstNameValidationBinding);
+            Binding lastNameValidationBinding = new Binding();
+            lastNameValidationBinding.Source = customerVSource;
+            lastNameValidationBinding.Path = new PropertyPath("LastName");
+            lastNameValidationBinding.NotifyOnValidationError = true;
+            lastNameValidationBinding.Mode = BindingMode.TwoWay;
+            lastNameValidationBinding.UpdateSourceTrigger =
+           UpdateSourceTrigger.PropertyChanged;
+            //string min length validator
+            lastNameValidationBinding.ValidationRules.Add(new StringMinLengthValidator());
+            lastNameTextBox.SetBinding(TextBox.TextProperty, lastNameValidationBinding);
+            //setare binding nou
+        }
 
 
     }
-
 }
